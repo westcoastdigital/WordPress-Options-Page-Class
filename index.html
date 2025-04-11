@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Settings Generator</title>
+    <style>
+        :root {
+            --primary: #2271b1;
+            --primary-dark: #135e96;
+            --primary-light: #72aee6;
+            --secondary: #f0f0f1;
+            --text: #1d2327;
+            --text-light: #50575e;
+            --white: #fff;
+            --border: #c3c4c7;
+            --success: #00a32a;
+            --danger: #d63638;
+            --warning: #dba617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            color: var(--text);
+            line-height: 1.5;
+            background-color: #f0f0f1;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .heading-with-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-row {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        select {
+            height: 36px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #b32d2e;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #008a20;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #dcdcde;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background-color: var(--white);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-bottom: -1px;
+        }
+
+        .tab.active {
+            background-color: var(--white);
+            border-color: var(--border);
+            border-bottom-color: var(--white);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .field-list {
+            margin-bottom: 20px;
+        }
+
+        .repeater-fields {
+            margin-left: 20px;
+            padding-left: 15px;
+            border-left: 2px solid var(--primary-light);
+        }
+
+        pre {
+            background-color: #f6f7f7;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 15px;
+            overflow: auto;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            max-height: 500px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .code-container {
+            position: relative;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group {
+            margin: 5px 0;
+        }
+
+        .checkbox-group label {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .field-options-container {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .options-list {
+            margin-bottom: 10px;
+        }
+
+        .option-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .option-row input {
+            flex: 1;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .drag-handle {
+            cursor: move;
+            padding: 2px 6px;
+            background: var(--secondary);
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 12px;
+            background-color: var(--primary-light);
+            color: var(--white);
+            margin-left: 8px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>WordPress Settings Generator</h1>
+
+        <div class="tabs-container">
+            <div class="tab active" data-tab="settings">Settings Configuration</div>
+            <div class="tab" data-tab="fields">Fields</div>
+            <div class="tab" data-tab="preview">Generated Code</div>
+        </div>
+
+        <div class="tab-content active" id="settings-tab">
+            <div class="card">
+                <h2>Settings Page Configuration</h2>
+
+                <div class="form-row">
+                    <label for="page_id">Page ID (Unique Identifier)</label>
+                    <input type="text" id="page_id" placeholder="my_settings_page" required>
+                    <div class="help-text">A unique identifier for this settings page. Used for option names in the
+                        database.</div>
+                </div>
+
+                <div class="form-row">
+                    <label for="page_title">Page Title</label>
+                    <input type="text" id="page_title" placeholder="My Settings Page" required>
+                    <div class="help-text">The title displayed at the top of the settings page.</div>
+                </div>
+
+                <div class="form-row">
+                    <label for="menu_title">Menu Title</label>
+                    <input type="text" id="menu_title" placeholder="My Settings" required>
+                    <div class="help-text">The text shown in the admin menu.</div>
+                </div>
+
+                <div class="form-row">
+                    <label for="capability">Required Capability</label>
+                    <input type="text" id="capability" value="manage_options">
+                    <div class="help-text">WordPress capability required to access this page.</div>
+                </div>
+
+                <div class="form-row">
+                    <label for="menu_type">Menu Type</label>
+                    <select id="menu_type">
+                        <option value="menu">Top Level Menu</option>
+                        <option value="submenu">Submenu</option>
+                    </select>
+                </div>
+
+                <div class="form-row submenu-option" style="display: none;">
+                    <label for="parent_menu">Parent Menu</label>
+                    <select id="parent_menu">
+                        <option value="index.php">Dashboard</option>
+                        <option value="edit.php">Posts</option>
+                        <option value="upload.php">Media</option>
+                        <option value="edit.php?post_type=page">Pages</option>
+                        <option value="edit-comments.php">Comments</option>
+                        <option value="themes.php">Appearance</option>
+                        <option value="plugins.php">Plugins</option>
+                        <option value="users.php">Users</option>
+                        <option value="tools.php">Tools</option>
+                        <option value="options-general.php">Settings</option>
+                    </select>
+                </div>
+
+                <div class="form-row menu-option">
+                    <label for="menu_icon">Menu Icon (Dashicon)</label>
+                    <input type="text" id="menu_icon" value="dashicons-admin-generic">
+                    <div class="help-text">Dashicon name or URL to an icon image.</div>
+                </div>
+
+                <div class="form-row">
+                    <label for="menu_position">Menu Position</label>
+                    <input type="number" id="menu_position" placeholder="Leave blank for default">
+                    <div class="help-text">Position in the menu order (1-100, optional).</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="enable_tabs"> Enable Tabs
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card tabs-section" style="display: none;">
+                <div class="heading-with-actions">
+                    <h2>Tabs</h2>
+                    <button class="btn" id="add-tab">Add Tab</button>
+                </div>
+
+                <div id="tabs-list" class="field-list">
+                    <!-- Tabs will be added here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="fields-tab">
+            <div class="heading-with-actions">
+                <h2>Fields</h2>
+                <button class="btn" id="add-field">Add Field</button>
+            </div>
+
+            <div id="fields-list" class="field-list">
+                <!-- Fields will be added here -->
+            </div>
+        </div>
+
+        <div class="tab-content" id="preview-tab">
+            <div class="heading-with-actions">
+                <h2>Generated PHP Code</h2>
+                <button class="btn" id="generate-code">Generate Code</button>
+            </div>
+
+            <div class="code-container">
+                <button class="btn copy-btn" id="copy-code">Copy</button>
+                <pre id="generated-code">// Click "Generate Code" to create PHP code</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Field Template (Hidden) -->
+    <template id="field-template">
+        <div class="card field-card" data-field-id="{id}">
+            <div class="card-header">
+                <div>
+                    <span class="drag-handle">↕</span>
+                    <span class="card-title">{title}</span>
+                    <span class="badge">{type}</span>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary field-toggle">▼</button>
+                    <button class="btn btn-danger remove-field">Remove</button>
+                </div>
+            </div>
+            <div class="field-content">
+                <div class="form-row">
+                    <label>Field ID</label>
+                    <input type="text" class="field-id" placeholder="field_id" required>
+                    <div class="help-text">Unique identifier for this field</div>
+                </div>
+
+                <div class="form-row">
+                    <label>Field Title</label>
+                    <input type="text" class="field-title" placeholder="Field Title" required>
+                </div>
+
+                <div class="form-row">
+                    <label>Field Type</label>
+                    <select class="field-type">
+                        <option value="text">Text</option>
+                        <option value="textarea">Textarea</option>
+                        <option value="wysiwyg">WYSIWYG Editor</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="toggle">Toggle Switch</option>
+                        <option value="radio">Radio Buttons</option>
+                        <option value="select">Select Dropdown</option>
+                        <option value="multiselect">Multi-Select</option>
+                        <option value="media">Media Upload</option>
+                        <option value="email">Email</option>
+                        <option value="url">URL</option>
+                        <option value="password">Password</option>
+                        <option value="number">Number</option>
+                        <option value="tel">Telephone</option>
+                        <option value="date">Date</option>
+                        <option value="color">Color Picker</option>
+                        <option value="repeater">Repeater</option>
+                    </select>
+                </div>
+
+                <div class="form-row tab-field" style="display: none;">
+                    <label>Tab</label>
+                    <select class="field-tab">
+                        <option value="">No Tab</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Description</label>
+                    <textarea class="field-description" rows="2"></textarea>
+                </div>
+
+                <div class="form-row field-placeholder" style="display: none;">
+                    <label>Placeholder</label>
+                    <input type="text" class="field-placeholder-input">
+                </div>
+
+                <div class="form-row field-default" style="display: none;">
+                    <label>Default Value</label>
+                    <input type="text" class="field-default-input">
+                </div>
+
+                <div class="field-options-container" style="display: none;">
+                    <div class="form-row">
+                        <label>Options</label>
+                        <div class="options-list">
+                            <!-- Options will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-secondary add-option">Add Option</button>
+                    </div>
+                </div>
+
+                <div class="field-number-attributes" style="display: none;">
+                    <div class="form-row">
+                        <label>Min Value</label>
+                        <input type="number" class="field-min">
+                    </div>
+                    <div class="form-row">
+                        <label>Max Value</label>
+                        <input type="number" class="field-max">
+                    </div>
+                    <div class="form-row">
+                        <label>Step</label>
+                        <input type="number" class="field-step" value="1" step="0.01">
+                    </div>
+                </div>
+
+                <div class="repeater-container" style="display: none;">
+                    <div class="heading-with-actions">
+                        <h3>Repeater Fields</h3>
+                        <button class="btn btn-secondary add-repeater-field">Add Field</button>
+                    </div>
+                    <div class="repeater-fields">
+                        <!-- Repeater fields will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Tab Template (Hidden) -->
+    <template id="tab-template">
+        <div class="card tab-card" data-tab-id="{id}">
+            <div class="card-header">
+                <div>
+                    <span class="drag-handle">↕</span>
+                    <span class="card-title">{title}</span>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary tab-toggle">▼</button>
+                    <button class="btn btn-danger remove-tab">Remove</button>
+                </div>
+            </div>
+            <div class="tab-content">
+                <div class="form-row">
+                    <label>Tab ID</label>
+                    <input type="text" class="tab-id" placeholder="tab_id" required>
+                </div>
+
+                <div class="form-row">
+                    <label>Tab Title</label>
+                    <input type="text" class="tab-title" placeholder="Tab Title" required>
+                </div>
+
+                <div class="form-row">
+                    <label>Description</label>
+                    <textarea class="tab-description" rows="2"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" class="default-tab"> Set as Default Tab
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Option Row Template (Hidden) -->
+    <template id="option-template">
+        <div class="option-row">
+            <input type="text" class="option-key" placeholder="option_key" required>
+            <input type="text" class="option-value" placeholder="Option Label" required>
+            <button type="button" class="btn btn-danger remove-option">×</button>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Tab Navigation
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // Show active content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                });
+            });
+
+            // Menu Type Toggle
+            const menuTypeSelect = document.getElementById('menu_type');
+            menuTypeSelect.addEventListener('change', function () {
+                const isSubmenu = this.value === 'submenu';
+                document.querySelector('.submenu-option').style.display = isSubmenu ? 'block' : 'none';
+                document.querySelector('.menu-option').style.display = isSubmenu ? 'none' : 'block';
+            });
+
+            // Enable Tabs Toggle
+            const enableTabsCheckbox = document.getElementById('enable_tabs');
+            enableTabsCheckbox.addEventListener('change', function () {
+                document.querySelector('.tabs-section').style.display = this.checked ? 'block' : 'none';
+                document.querySelectorAll('.tab-field').forEach(el => {
+                    el.style.display = this.checked ? 'block' : 'none';
+                });
+                updateTabDropdowns();
+            });
+
+            // Add Tab Button
+            const addTabButton = document.getElementById('add-tab');
+            addTabButton.addEventListener('click', addTab);
+
+            // Add Field Button
+            const addFieldButton = document.getElementById('add-field');
+            addFieldButton.addEventListener('click', addField);
+
+            // Generate Code Button
+            const generateCodeButton = document.getElementById('generate-code');
+            generateCodeButton.addEventListener('click', generateCode);
+
+            // Copy Code Button
+            const copyCodeButton = document.getElementById('copy-code');
+            copyCodeButton.addEventListener('click', function () {
+                const codeElement = document.getElementById('generated-code');
+
+                // Create a temporary textarea to copy from
+                const textarea = document.createElement('textarea');
+                textarea.value = codeElement.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                // Change button text temporarily
+                const originalText = this.textContent;
+                this.textContent = 'Copied!';
+                setTimeout(() => {
+                    this.textContent = originalText;
+                }, 2000);
+            });
+
+            // Field counter for unique IDs
+            let fieldCounter = 0;
+            let tabCounter = 0;
+
+            // Add a new tab
+            function addTab() {
+                tabCounter++;
+                const tabId = `tab_${tabCounter}`;
+                const tabTemplate = document.getElementById('tab-template').innerHTML
+                    .replace(/{id}/g, tabId)
+                    .replace(/{title}/g, `Tab ${tabCounter}`);
+
+                const tabsList = document.getElementById('tabs-list');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = tabTemplate;
+
+                const tabElement = tempDiv.firstElementChild;
+
+                // Set initial values
+                tabElement.querySelector('.tab-id').value = `tab_${tabCounter}`;
+                tabElement.querySelector('.tab-title').value = `Tab ${tabCounter}`;
+
+                // Add event listeners
+                setupTabEventListeners(tabElement);
+
+                tabsList.appendChild(tabElement);
+                updateTabDropdowns();
+            }
+
+            // Setup tab event listeners
+            function setupTabEventListeners(tabElement) {
+                // Toggle button
+                const toggleButton = tabElement.querySelector('.tab-toggle');
+                toggleButton.addEventListener('click', function () {
+                    const content = tabElement.querySelector('.tab-content');
+                    const isVisible = content.style.display !== 'none';
+                    content.style.display = isVisible ? 'none' : 'block';
+                    this.textContent = isVisible ? '▼' : '▲';
+                });
+
+                // Remove button
+                const removeButton = tabElement.querySelector('.remove-tab');
+                removeButton.addEventListener('click', function () {
+                    if (confirm('Are you sure you want to remove this tab?')) {
+                        tabElement.remove();
+                        updateTabDropdowns();
+                    }
+                });
+
+                // Default tab radio behavior
+                const defaultTabCheckbox = tabElement.querySelector('.default-tab');
+                defaultTabCheckbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        // Uncheck all other default tab checkboxes
+                        document.querySelectorAll('.default-tab').forEach(checkbox => {
+                            if (checkbox !== this) {
+                                checkbox.checked = false;
+                            }
+                        });
+                    }
+                });
+
+                // Update on field change
+                const tabIdInput = tabElement.querySelector('.tab-id');
+                const tabTitleInput = tabElement.querySelector('.tab-title');
+
+                tabIdInput.addEventListener('input', function () {
+                    tabElement.setAttribute('data-tab-id', this.value);
+                    updateTabDropdowns();
+                });
+
+                tabTitleInput.addEventListener('input', function () {
+                    tabElement.querySelector('.card-title').textContent = this.value;
+                    updateTabDropdowns();
+                });
+            }
+
+            // Update tab dropdowns in all fields
+            function updateTabDropdowns() {
+                const tabOptions = Array.from(document.querySelectorAll('.tab-card')).map(tab => {
+                    const id = tab.querySelector('.tab-id').value;
+                    const title = tab.querySelector('.tab-title').value;
+                    return { id, title };
+                });
+
+                document.querySelectorAll('.field-tab').forEach(select => {
+                    const currentValue = select.value;
+
+                    // Clear existing options except the first one
+                    while (select.options.length > 1) {
+                        select.remove(1);
+                    }
+
+                    // Add tab options
+                    tabOptions.forEach(tab => {
+                        const option = document.createElement('option');
+                        option.value = tab.id;
+                        option.textContent = tab.title;
+                        select.appendChild(option);
+                    });
+
+                    // Restore selected value if possible
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                });
+            }
+
+            // Add a new field
+            function addField(event, parentElement = null, isRepeaterField = false) {
+                fieldCounter++;
+                const fieldId = `field_${fieldCounter}`;
+                const fieldTemplate = document.getElementById('field-template').innerHTML
+                    .replace(/{id}/g, fieldId)
+                    .replace(/{title}/g, `Field ${fieldCounter}`)
+                    .replace(/{type}/g, 'text');
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = fieldTemplate;
+
+                const fieldElement = tempDiv.firstElementChild;
+
+                // Set data attributes
+                fieldElement.setAttribute('data-field-id', fieldId);
+                if (isRepeaterField) {
+                    fieldElement.setAttribute('data-repeater-field', 'true');
+                }
+
+                // Set initial values
+                fieldElement.querySelector('.field-id').value = `field_${fieldCounter}`;
+                fieldElement.querySelector('.field-title').value = `Field ${fieldCounter}`;
+
+                // Show/hide tab dropdown based on tabs being enabled
+                const tabField = fieldElement.querySelector('.tab-field');
+                tabField.style.display = document.getElementById('enable_tabs').checked ? 'block' : 'none';
+
+                // Add event listeners
+                setupFieldEventListeners(fieldElement);
+
+                // Append to parent or main list
+                if (parentElement) {
+                    parentElement.appendChild(fieldElement);
+                } else {
+                    document.getElementById('fields-list').appendChild(fieldElement);
+                }
+
+                // Update tab dropdowns
+                updateTabDropdowns();
+
+                // Return the element in case we need it
+                return fieldElement;
+            }
+
+            // Setup field event listeners
+            function setupFieldEventListeners(fieldElement) {
+                // Toggle button
+                const toggleButton = fieldElement.querySelector('.field-toggle');
+                toggleButton.addEventListener('click', function () {
+                    const content = fieldElement.querySelector('.field-content');
+                    const isVisible = content.style.display !== 'none';
+                    content.style.display = isVisible ? 'none' : 'block';
+                    this.textContent = isVisible ? '▼' : '▲';
+                });
+
+                // Remove button
+                const removeButton = fieldElement.querySelector('.remove-field');
+                removeButton.addEventListener('click', function () {
+                    if (confirm('Are you sure you want to remove this field?')) {
+                        fieldElement.remove();
+                    }
+                });
+
+                // Field type change
+                const typeSelect = fieldElement.querySelector('.field-type');
+                typeSelect.addEventListener('change', function () {
+                    updateFieldTypeOptions(fieldElement, this.value);
+                });
+
+                // Add option button (for select, radio, etc.)
+                const addOptionButton = fieldElement.querySelector('.add-option');
+                if (addOptionButton) {
+                    addOptionButton.addEventListener('click', function () {
+                        addOption(fieldElement);
+                    });
+                }
+
+                // Add repeater field button
+                const addRepeaterFieldButton = fieldElement.querySelector('.add-repeater-field');
+                if (addRepeaterFieldButton) {
+                    addRepeaterFieldButton.addEventListener('click', function () {
+                        const repeaterFieldsContainer = fieldElement.querySelector('.repeater-fields');
+                        addField(null, repeaterFieldsContainer, true);
+                    });
+                }
+
+                // Update field title in header when changed
+                const titleInput = fieldElement.querySelector('.field-title');
+                titleInput.addEventListener('input', function () {
+                    fieldElement.querySelector('.card-title').textContent = this.value;
+                });
+
+                // Update field type badge when changed
+                typeSelect.addEventListener('change', function () {
+                    fieldElement.querySelector('.badge').textContent = this.value;
+                });
+            }
+
+            // Continuation of the script...
+
+            // Add option for select/radio fields
+            function addOption(fieldElement) {
+                const optionsContainer = fieldElement.querySelector('.options-list');
+                const optionTemplate = document.getElementById('option-template').innerHTML;
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = optionTemplate;
+                const optionRow = tempDiv.firstElementChild;
+
+                // Add event listener for remove button
+                const removeOptionButton = optionRow.querySelector('.remove-option');
+                removeOptionButton.addEventListener('click', function () {
+                    optionRow.remove();
+                });
+
+                optionsContainer.appendChild(optionRow);
+            }
+
+            // Update field options based on field type
+            function updateFieldTypeOptions(fieldElement, fieldType) {
+                // Get all field-specific option containers
+                const placeholderContainer = fieldElement.querySelector('.field-placeholder');
+                const defaultValueContainer = fieldElement.querySelector('.field-default');
+                const optionsContainer = fieldElement.querySelector('.field-options-container');
+                const numberAttributesContainer = fieldElement.querySelector('.field-number-attributes');
+                const repeaterContainer = fieldElement.querySelector('.repeater-container');
+
+                // Hide all containers by default
+                placeholderContainer.style.display = 'none';
+                defaultValueContainer.style.display = 'none';
+                optionsContainer.style.display = 'none';
+                numberAttributesContainer.style.display = 'none';
+                repeaterContainer.style.display = 'none';
+
+                // Show relevant containers based on field type
+                switch (fieldType) {
+                    case 'text':
+                    case 'textarea':
+                    case 'email':
+                    case 'url':
+                    case 'password':
+                    case 'tel':
+                    case 'date':
+                        placeholderContainer.style.display = 'block';
+                        defaultValueContainer.style.display = 'block';
+                        break;
+
+                    case 'number':
+                        placeholderContainer.style.display = 'block';
+                        defaultValueContainer.style.display = 'block';
+                        numberAttributesContainer.style.display = 'block';
+                        break;
+
+                    case 'checkbox':
+                    case 'toggle':
+                        defaultValueContainer.style.display = 'block';
+                        break;
+
+                    case 'radio':
+                    case 'select':
+                    case 'multiselect':
+                        defaultValueContainer.style.display = 'block';
+                        optionsContainer.style.display = 'block';
+
+                        // Add default options if none exist
+                        const optionsList = fieldElement.querySelector('.options-list');
+                        if (optionsList.children.length === 0) {
+                            for (let i = 0; i < 2; i++) {
+                                addOption(fieldElement);
+                            }
+                        }
+                        break;
+
+                    case 'repeater':
+                        repeaterContainer.style.display = 'block';
+                        break;
+                }
+            }
+
+            function generateCode() {
+                const pageId = document.getElementById('page_id').value;
+                const pageTitle = document.getElementById('page_title').value;
+                const menuTitle = document.getElementById('menu_title').value;
+                const capability = document.getElementById('capability').value;
+                const menuType = document.getElementById('menu_type').value;
+                const parentMenu = document.getElementById('parent_menu').value;
+                const menuIcon = document.getElementById('menu_icon').value;
+                const menuPosition = document.getElementById('menu_position').value;
+                const enableTabs = document.getElementById('enable_tabs').checked;
+
+                const fields = document.querySelectorAll('#fields-list > .field-card');
+                const tabs = document.querySelectorAll('#tabs-list > .tab-card');
+
+                if (!pageId || !pageTitle || !menuTitle) {
+                    alert('Please fill in all required fields in the Settings Configuration tab.');
+                    return;
+                }
+
+                let code = `<?php\n\nfunction ${pageId}_admin_page_init() {\n\n    // Initialize the settings page\n    $settings = new WP_Settings_Generator(\n        '${pageId}',\n        '${pageTitle}',\n        '${menuTitle}',\n        '${capability}',\n        [\n            'type' => '${menuType}',\n            ${menuType === 'menu' ? `'position' => ${menuPosition || 80},\n            'icon' => '${menuIcon}'` : `'parent' => '${parentMenu}'`}\n        ]\n    );\n\n`;
+
+                if (enableTabs && tabs.length) {
+                    const defaultTabId = tabs[0].querySelector('.tab-id').value;
+                    code += `    // Enable tabs\n    $settings->enable_tabs('${defaultTabId}');\n\n`;
+                    code += `    // Add tabs\n`;
+                    tabs.forEach(tab => {
+                        const tabId = tab.querySelector('.tab-id').value;
+                        const tabTitle = tab.querySelector('.tab-title').value;
+                        code += `    $settings->add_tab('${tabId}', '${tabTitle}');\n`;
+                    });
+                    code += `\n`;
+                }
+
+                fields.forEach(field => {
+                    if (field.getAttribute('data-repeater-field') === 'true') return;
+
+                    const id = field.querySelector('.field-id').value;
+                    const title = field.querySelector('.field-title').value;
+                    const type = field.querySelector('.field-type').value;
+                    const desc = field.querySelector('.field-description').value;
+                    const defaultVal = field.querySelector('.field-default-input')?.value;
+                    const placeholder = field.querySelector('.field-placeholder-input')?.value;
+                    const tab = enableTabs ? field.querySelector('.field-tab').value : '';
+
+                    const min = field.querySelector('.field-min')?.value;
+                    const max = field.querySelector('.field-max')?.value;
+                    const step = field.querySelector('.field-step')?.value || 1;
+
+                    const options = field.querySelectorAll('.option-row');
+                    const optionsMap = [];
+                    options.forEach(opt => {
+                        const key = opt.querySelector('.option-key').value;
+                        const val = opt.querySelector('.option-value').value;
+                        optionsMap.push(`                '${key}' => __('${val}')`);
+                    });
+
+                    const args = [`            'description' => __('${desc}')`];
+                    if (defaultVal) args.push(`            'default' => ${Array.isArray(defaultVal) ? '[' + defaultVal + ']' : `'${defaultVal}'`}`);
+                    if (optionsMap.length) args.push(`            'options' => [\n${optionsMap.join(',\n')}\n            ]`);
+                    if (min) args.push(`            'min' => ${min}`);
+                    if (max) args.push(`            'max' => ${max}`);
+                    if (step) args.push(`            'step' => ${step}`);
+
+                    code += `    $settings->add_${type}_field(\n        '${id}',\n        __('${title}'),\n        [\n${args.join(',\n')}\n        ],\n        '${tab}'\n    );\n\n`;
+                });
+
+                code += `}\nadd_action('init', '${pageId}_admin_page_init');`;
+
+                document.getElementById('generated-code').textContent = code;
+            }
+
+        });
+    </script>
+</body>
+
+</html>
