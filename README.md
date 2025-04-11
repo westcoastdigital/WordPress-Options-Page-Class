@@ -1,11 +1,13 @@
 # WordPress Options Page Class
 Build custom options pages with repeaters for tabs and fields.
 
-### Usage
+## Usage
+There is a generator included in the repo as index.html ot you can just go to the [Github Page](https://westcoastdigital.github.io/WordPress-Options-Page-Class/) alternatively you can manually create the code (see examples below)
 
 ### Include the class
 You need to include it within your theme or plugin eg<br/>
 ```require_once plugin_dir_path(__FILE__) . 'inc/class-wp-settings-generator.php';```
+
 
 ### Register Page
 ```
