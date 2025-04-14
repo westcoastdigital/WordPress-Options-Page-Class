@@ -24,7 +24,7 @@ $settings = new WP_Settings_Generator(
     ]
 );
 ```
-<br/>
+
 ```
 // Initialize the settings page as sub menu
  $settings = new WP_Settings_Generator(
@@ -53,7 +53,7 @@ $settings->enable_tabs('display'); // change to tab id
 
 ### Register Tabs
 This is done using ```add_tab($tab_id, $tab_label)```<br/>
-Eg: add multiple tabs<br/>
+eg: add multiple tabs<br/>
 ```
  // Add tabs
 $settings->add_tab('general', 'General Settings')
@@ -92,14 +92,13 @@ $settings = new WP_Settings_Generator(
     ]
 );
 ```
-<br/>
 Then you would retrieve with ```$settings = get_option('my_custom_settings'); ``` and then from there get your field value from the field id.<br/>
-EG:<br/>
+eg:
 ```
 $settings = get_option('page_id'); // replace page_id with the id of your page
 $field_value = isset($settings['field_id']) ?  $settings['field_id'] : ''; // replace field_id with the id of the field you want to retrieve
-```<br/>
-Images are stored as an ID so if you want to output the image you need to<br/>
+```
+Images are stored as an ID so if you want to output the image you need to
 ```
 $settings = get_option('page_id');
 $image_id = isset($settings['field_id']) ?  $settings['field_id'] : '';
@@ -108,7 +107,6 @@ if($image_id && $image_id != '') {
     $image = wp_get_attachment_image($image_id, $size);
 }
 ```
-<br/>
 See [developer options](https://developer.wordpress.org/reference/functions/wp_get_attachment_image/) for more info<br/>
 Date fields are stored in yyyy-mm-dd format so to output as different value<br/>
 ```
@@ -118,7 +116,6 @@ $new_date = new DateTime($date_field);
 $format = 'F j, Y';
 $date = $new_date->format($format);
 ```
-<br/>
 See [date formatting](https://wordpress.org/documentation/article/customize-date-and-time-format/) for more info<br/>
 
 
@@ -130,8 +127,7 @@ You can add conditional logic to the field by adding conditional args eg<br/>
     'value' => 'field_value' // change to match the field value to check against
 ]
 ```
-<br/><br/>
-eg:<br/>
+eg:
 ```
 // Radio field
 $settings->add_radio_field(
