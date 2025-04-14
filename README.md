@@ -76,6 +76,52 @@ $settings->field_type_function( // replace field_type_function witht the require
 );
 ```
 
+### Retreiving Fields
+Field values are stored in the options table under a single entry for the page_id used in the WP_Settings_Generator initialisation<br/>
+For example<br/>
+```
+$settings = new WP_Settings_Generator(
+    'my_custom_settings', // the ID for retrieving values
+    'Rewards',
+    'Simpli Rewards',
+    'manage_options',
+    [
+        'type' => 'menu',
+        'position' => 80,
+        'icon' => 'dashicons-awards'
+    ]
+);
+```
+<br/>
+Then you would retrieve with ```$settings = get_option('my_custom_settings'); ``` and then from there get your field value from the field id.<br/>
+EG:<br/>
+```
+$settings = get_option('page_id'); // replace page_id with the id of your page
+$field_value = isset($settings['field_id']) ?  $settings['field_id'] : ''; // replace field_id with the id of the field you want to retrieve
+```<br/>
+Images are stored as an ID so if you want to output the image you need to<br/>
+```
+$settings = get_option('page_id');
+$image_id = isset($settings['field_id']) ?  $settings['field_id'] : '';
+if($image_id && $image_id != '') {
+    $size = 'thumbnail'; // what size you want the image, thumbnail is default
+    $image = wp_get_attachment_image($image_id, $size);
+}
+```
+<br/>
+See [developer options](https://developer.wordpress.org/reference/functions/wp_get_attachment_image/) for more info<br/>
+Date fields are stored in yyyy-mm-dd format so to output as different value<br/>
+```
+$settings = get_option('page_id');
+$date_field = isset($settings['field_id']) ?  $settings['field_id'] : '';
+$new_date = new DateTime($date_field);
+$format = 'F j, Y';
+$date = $new_date->format($format);
+```
+<br/>
+See [date formatting](https://wordpress.org/documentation/article/customize-date-and-time-format/) for more info<br/>
+
+
 ### Conditional Logic
 You can add conditional logic to the field by adding conditional args eg<br/>
 ```
