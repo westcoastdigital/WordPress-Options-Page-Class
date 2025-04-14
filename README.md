@@ -76,6 +76,51 @@ $settings->field_type_function( // replace field_type_function witht the require
 );
 ```
 
+### Conditional Logic
+You can add conditional logic to the field by adding conditional args eg<br/>
+```
+'condition' => [
+    'field' => 'field_id', // change to match the field id to check against
+    'value' => 'field_value' // change to match the field value to check against
+]
+```
+<br/><br/>
+eg:<br/>
+```
+// Radio field
+$settings->add_radio_field(
+    'layout_style',
+    'Layout Style',
+    [
+        'description' => 'Choose your preferred layout',
+        'default' => 'boxed',
+        'options' => [
+            'boxed' => 'Boxed Layout',
+            'wide' => 'Wide Layout',
+            'fullwidth' => 'Full Width Layout',
+            'custom' => 'Custom'
+        ]
+    ],
+    'display'
+);
+
+// Conditional Field
+$settings->add_text_field(
+    'site_title',
+    'Site Title',
+    [
+        'description' => 'Enter your site title',
+        'default' => get_bloginfo('name'),
+        'placeholder' => 'Enter site title here',
+        'condition' => [
+            'field' => 'layout_style',
+            'value' => 'custom'
+        ]
+    ],
+    'display'
+);
+```
+
 ### Field Examples
 All examples are set to be within a tab
 ```

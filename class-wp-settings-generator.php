@@ -118,6 +118,8 @@ if (!class_exists('WP_Settings_Generator')) {
             add_action('admin_menu', [$this, 'add_settings_page']);
             add_action('admin_init', [$this, 'register_settings']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+
+            $this->enqueue_conditional_script();
         }
 
         /**
@@ -958,6 +960,16 @@ if (!class_exists('WP_Settings_Generator')) {
             $field_id = $field['id'];
             $options = get_option($this->page_id, []);
 
+            // Check if this field has conditions
+            $condition_attributes = '';
+            if (!empty($field['condition'])) {
+                $condition = $field['condition'];
+                $condition_field = $this->page_id . '[' . $condition['field'] . ']';
+                $condition_attributes = ' data-condition-field="' . esc_attr($condition_field) . '" data-condition-value="' . esc_attr($condition['value']) . '"';
+            }
+
+            // Start the field wrapper with conditional attributes if any
+            echo '<div class="field-wrapper"' . $condition_attributes . '>';
 
             // Special handling for multiselect defaults
             if ($field['type'] === 'multiselect') {
@@ -1053,6 +1065,8 @@ if (!class_exists('WP_Settings_Generator')) {
             if (!empty($field['description'])) {
                 echo '<p class="description">' . wp_kses_post($field['description']) . '</p>';
             }
+
+            echo '</div>'; // Close the wrapper
         }
 
         /**
@@ -1552,7 +1566,7 @@ if (!class_exists('WP_Settings_Generator')) {
                 value="<?php echo esc_attr($value); ?>"
                 class="<?php echo esc_attr($class); ?>"
                 <?php echo $attr_string; ?> />
-<?php
+            <?php
         }
 
         /**
@@ -1576,6 +1590,65 @@ if (!class_exists('WP_Settings_Generator')) {
             }
 
             return implode(' ', $attributes);
+        }
+
+        public function enqueue_conditional_script()
+        {
+            add_action('admin_footer', function () {
+            ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        function evaluateConditions() {
+                            document.querySelectorAll('[data-condition-field]').forEach(function(el) {
+                                var conditionField = el.getAttribute('data-condition-field');
+                                var conditionValue = el.getAttribute('data-condition-value');
+                                var fieldFound = false;
+
+                                // First try to find by name attribute (for most inputs)
+                                var inputs = document.querySelectorAll('[name="' + conditionField + '"]');
+                                if (inputs.length === 0) {
+                                    // For radio buttons, try with array notation
+                                    inputs = document.querySelectorAll('[name="' + conditionField + '"]');
+                                }
+
+                                var show = false;
+
+                                inputs.forEach(function(input) {
+                                    fieldFound = true;
+                                    if (input.type === 'radio' && input.checked && input.value === conditionValue) {
+                                        show = true;
+                                    } else if (input.type === 'checkbox' && input.checked && conditionValue === '1') {
+                                        show = true;
+                                    } else if (input.type !== 'radio' && input.type !== 'checkbox' && input.value === conditionValue) {
+                                        show = true;
+                                    }
+                                });
+
+                                if (fieldFound) {
+                                    // el.style.display = show ? '' : 'none';
+                                    // Find the parent tr and apply display style to it
+                                    var parentTr = el.closest('tr');
+                                    if (parentTr) {
+                                        parentTr.style.display = show ? '' : 'none';
+                                    } else {
+                                        // Fallback to the original element if no parent tr is found
+                                        el.style.display = show ? '' : 'none';
+                                    }
+                                }
+                            });
+                        }
+
+                        // Run on page load
+                        evaluateConditions();
+
+                        // Run on any input change
+                        document.addEventListener('change', function(e) {
+                            evaluateConditions();
+                        });
+                    });
+                </script>
+<?php
+            });
         }
     }
 }
