@@ -154,79 +154,107 @@ if (!class_exists('WP_Settings_Generator')) {
          */
         public function print_field_scripts()
         {
-?>
+        ?>
             <script>
                 jQuery(document).ready(function($) {
                     // Initialize color pickers
                     $('.wp-settings-color-field').wpColorPicker();
-
+        
                     // Initialize date pickers
                     $('.wp-settings-date-field').datepicker({
                         dateFormat: 'yy-mm-dd',
                         changeMonth: true,
                         changeYear: true
                     });
-
+        
+                    // Media Uploader - Improved implementation
+                    function initMediaUploader() {
+                        $('.wp-settings-media-upload').off('click').on('click', function(e) {
+                            e.preventDefault();
+        
+                            var button = $(this);
+                            var fieldContainer = button.closest('.wp-settings-media-field-container');
+                            var field = fieldContainer.find('.wp-settings-media-field');
+                            var preview = fieldContainer.find('.wp-settings-media-preview');
+                            var removeButton = fieldContainer.find('.wp-settings-media-remove');
+        
+                            // Create the media frame if it doesn't exist
+                            var frame = wp.media({
+                                title: 'Select or Upload Media',
+                                button: {
+                                    text: 'Use this media'
+                                },
+                                multiple: false
+                            });
+        
+                            // When an image is selected in the media frame...
+                            frame.on('select', function() {
+                                // Get media attachment details from the frame state
+                                var attachment = frame.state().get('selection').first().toJSON();
+                                
+                                // Set the value of our hidden input to the attachment id
+                                field.val(attachment.id);
+                                
+                                // Clear the preview
+                                preview.empty();
+        
+                                // Update preview based on attachment type
+                                if (attachment.type === 'image') {
+                                    preview.html('<img src="' + attachment.sizes.thumbnail.url + '" alt="" style="max-width: 150px; max-height: 150px;" />');
+                                } else {
+                                    preview.html('<div class="media-info"><strong>Type:</strong> ' + attachment.type + '<br><strong>Name:</strong> ' + attachment.filename + '</div>');
+                                }
+        
+                                // Show the remove button
+                                removeButton.show();
+                                
+                                // Trigger change for conditional fields
+                                field.trigger('change');
+                            });
+        
+                            // Open the modal
+                            frame.open();
+                        });
+        
+                        // Handle remove media button
+                        $('.wp-settings-media-remove').off('click').on('click', function(e) {
+                            e.preventDefault();
+        
+                            var button = $(this);
+                            var fieldContainer = button.closest('.wp-settings-media-field-container');
+                            var field = fieldContainer.find('.wp-settings-media-field');
+                            var preview = fieldContainer.find('.wp-settings-media-preview');
+        
+                            // Clear the field value
+                            field.val('');
+                            
+                            // Clear the preview
+                            preview.empty();
+                            
+                            // Hide the remove button
+                            button.hide();
+                            
+                            // Trigger change for conditional fields
+                            field.trigger('change');
+                        });
+                    }
+        
                     // Initialize media fields
-                    $('.wp-settings-media-upload').click(function(e) {
-                        e.preventDefault();
-
-                        var button = $(this);
-                        var field = button.siblings('.wp-settings-media-field');
-                        var preview = button.siblings('.wp-settings-media-preview');
-                        var removeButton = button.siblings('.wp-settings-media-remove');
-
-                        var frame = wp.media({
-                            title: 'Select or Upload Media',
-                            button: {
-                                text: 'Use this media'
-                            },
-                            multiple: false
-                        });
-
-                        frame.on('select', function() {
-                            var attachment = frame.state().get('selection').first().toJSON();
-                            field.val(attachment.id);
-
-                            // Update preview based on attachment type
-                            if (attachment.type === 'image') {
-                                preview.html('<img src="' + attachment.url + '" alt="" style="max-width: 150px; max-height: 150px;" />');
-                            } else {
-                                preview.html('<div class="media-info"><strong>Type:</strong> ' + attachment.type + '<br><strong>Name:</strong> ' + attachment.filename + '</div>');
-                            }
-
-                            removeButton.show();
-                        });
-
-                        frame.open();
-                    });
-
-                    // Handle remove media button
-                    $('.wp-settings-media-remove').click(function(e) {
-                        e.preventDefault();
-
-                        var button = $(this);
-                        var field = button.siblings('.wp-settings-media-field');
-                        var preview = button.siblings('.wp-settings-media-preview');
-
-                        field.val('');
-                        preview.html('');
-                        button.hide();
-                    });
-
+                    initMediaUploader();
+        
                     // Toggle switch behavior
                     $('.wp-settings-toggle input').change(function() {
                         var label = $(this).siblings('.wp-settings-toggle-text');
                         var onText = $(this).data('on-text') || 'On';
                         var offText = $(this).data('off-text') || 'Off';
-
+        
                         if ($(this).is(':checked')) {
                             label.text(onText);
                         } else {
                             label.text(offText);
                         }
                     });
-
+        
                     // Multiselect functionality
                     $('.wp-settings-multiselect').on('change', function() {
                         var values = [];
@@ -235,7 +263,7 @@ if (!class_exists('WP_Settings_Generator')) {
                         });
                         $(this).siblings('.wp-settings-multiselect-value').val(JSON.stringify(values));
                     });
-
+        
                     // Initialize multiselect fields from hidden input
                     $('.wp-settings-multiselect').each(function() {
                         var values = $(this).siblings('.wp-settings-multiselect-value').val();
@@ -1346,14 +1374,18 @@ if (!class_exists('WP_Settings_Generator')) {
                     // Check if it's an image
                     $attachment_type = get_post_mime_type($value);
                     if (strpos($attachment_type, 'image') !== false) {
-                        $preview = '<img src="' . esc_url($attachment) . '" alt="" style="max-width: 150px; max-height: 150px;" />';
+                        $image_src = wp_get_attachment_image_src($value, 'thumbnail');
+                        if ($image_src) {
+                            $preview = '<img src="' . esc_url($image_src[0]) . '" alt="" style="max-width: 150px; max-height: 150px;" />';
+                        } else {
+                            $preview = '<img src="' . esc_url($attachment) . '" alt="" style="max-width: 150px; max-height: 150px;" />';
+                        }
                     } else {
                         $attachment_data = get_post($value);
                         $preview = '<div class="media-info"><strong>Type:</strong> ' . esc_html($attachment_type) . '<br><strong>Name:</strong> ' . esc_html(basename($attachment)) . '</div>';
                     }
                 }
             }
-
         ?>
             <div class="wp-settings-media-field-container">
                 <input
@@ -1368,8 +1400,8 @@ if (!class_exists('WP_Settings_Generator')) {
                 </div>
 
                 <div class="wp-settings-media-buttons">
-                    <button class="button wp-settings-media-upload"><?php echo esc_html($upload_button_text); ?></button>
-                    <button class="button wp-settings-media-remove" <?php echo empty($value) ? 'style="display:none;"' : ''; ?>><?php echo esc_html($remove_button_text); ?></button>
+                    <button type="button" class="button wp-settings-media-upload"><?php echo esc_html($upload_button_text); ?></button>
+                    <button type="button" class="button wp-settings-media-remove" <?php echo empty($value) ? 'style="display:none;"' : ''; ?>><?php echo esc_html($remove_button_text); ?></button>
                 </div>
             </div>
         <?php
