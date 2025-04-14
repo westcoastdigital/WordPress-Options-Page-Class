@@ -640,3 +640,45 @@ function simpli_rewards_admin_page_init() {
 }
 add_action('init', 'simpli_rewards_admin_page_init');
 ```
+### Create Custom Fields
+To create a new custom field there is a hook, here is an example on how to create a page picker ```do_action('wp_settings_generator_render_field_' . $field['type'], $field, $name, $value, $this);``` where you replace the ```$field['type']``` with what you want it to be
+Here is an example to create a page picker<br/>
+```
+function simpli_add_custom_field_page_picker($field, $name, $value) {
+    $class = !empty($field['class']) ? $field['class'] . ' wp-settings-select' : 'wp-settings-select';
+    $attrs = isset($field['attributes']) ? $field['attributes'] : [];
+    $attr_string = '';
+    foreach ($attrs as $attr => $val) {
+        $attr_string .= sprintf(' %s="%s"', esc_attr($attr), esc_attr($val));
+    }
+
+    $pages = get_pages();
+    ?>
+    <select
+        id="<?php echo esc_attr($field['id']); ?>"
+        name="<?php echo esc_attr($name); ?>"
+        class="<?php echo esc_attr($class); ?>"
+        <?php echo $attr_string; ?>>
+        <option value=""><?= __('Choose a page') ?></option>
+        <?php foreach ($pages as $page) : ?>
+            <option value="<?php echo esc_attr($page->ID); ?>" <?php selected($value, $page->ID); ?>> // value is the page id
+                <?php echo esc_html($page->post_title); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <?php
+}
+add_action('wp_settings_generator_render_field_page_picker', 'simpli_add_custom_field_page_picker', 10, 4); // page_picker is the field type
+```
+And then to include it in your settings page it would look like<br/>
+```
+$settings->add_field(
+    'page_id', // Field ID
+    __('Homepage'), // Label
+    'page_picker', // Custom field type created in action
+    [
+        'description' => __('Select the page to be used as the homepage.'), // Optional description
+    ],
+    'customisations' // Tab ID (optional)
+ );
+```
