@@ -516,6 +516,27 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" class="enable-condition"> Enable Conditional Logic
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="conditional-logic-fields" style="display: none;">
+                    <div class="form-row">
+                        <label>Condition Field</label>
+                        <select class="condition-field-id">
+                            <option value="">Select field</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Condition Value</label>
+                        <input type="text" class="condition-field-value" placeholder="Value to match">
+                    </div>
+                </div>
+
                 <div class="field-number-attributes" style="display: none;">
                     <div class="form-row">
                         <label>Min Value</label>
@@ -869,9 +890,31 @@
                 typeSelect.addEventListener('change', function () {
                     fieldElement.querySelector('.badge').textContent = this.value;
                 });
-            }
 
-            // Continuation of the script...
+                // Toggle conditional logic fields
+                const conditionCheckbox = fieldElement.querySelector('.enable-condition');
+                const conditionFields = fieldElement.querySelector('.conditional-logic-fields');
+                conditionCheckbox.addEventListener('change', function () {
+                    conditionFields.style.display = this.checked ? 'block' : 'none';
+                });
+
+                // Populate field list for conditional logic
+                const conditionFieldSelect = fieldElement.querySelector('.condition-field-id');
+                function updateConditionFieldList() {
+                    const allFieldCards = document.querySelectorAll('.field-card');
+                    conditionFieldSelect.innerHTML = '<option value="">Select field</option>';
+                    allFieldCards.forEach(card => {
+                        const id = card.querySelector('.field-id')?.value;
+                        if (id && card !== fieldElement) {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = id;
+                            conditionFieldSelect.appendChild(option);
+                        }
+                    });
+                }
+                updateConditionFieldList();
+            }
 
             // Add option for select/radio fields
             function addOption(fieldElement) {
@@ -1008,12 +1051,23 @@
                         optionsMap.push(`                '${key}' => __('${val}')`);
                     });
 
+                    const conditionEnabled = field.querySelector('.enable-condition')?.checked;
+
                     const args = [`            'description' => __('${desc}')`];
                     if (defaultVal) args.push(`            'default' => ${Array.isArray(defaultVal) ? '[' + defaultVal + ']' : `'${defaultVal}'`}`);
                     if (optionsMap.length) args.push(`            'options' => [\n${optionsMap.join(',\n')}\n            ]`);
                     if (min) args.push(`            'min' => ${min}`);
                     if (max) args.push(`            'max' => ${max}`);
                     if (step) args.push(`            'step' => ${step}`);
+
+                    if (conditionEnabled) {
+                        const conditionField = field.querySelector('.condition-field-id')?.value;
+                        const conditionValue = field.querySelector('.condition-field-value')?.value;
+                        if (conditionField && conditionValue) {
+                            args.push(`            'condition' => [\n                'field' => '${conditionField}',\n                'value' => '${conditionValue}'\n            ]`);
+                        }
+                    }
+                    console.log(args);
 
                     code += `    $settings->add_${type}_field(\n        '${id}',\n        __('${title}'),\n        [\n${args.join(',\n')}\n        ],\n        '${tab}'\n    );\n\n`;
                 });
