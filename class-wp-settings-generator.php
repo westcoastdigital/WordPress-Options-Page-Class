@@ -1446,7 +1446,7 @@ if (!class_exists('WP_Settings_Generator')) {
                     }
                 }
             }
-        ?>
+            ?>
             <div class="wp-settings-media-field-container">
                 <input
                     type="hidden"
@@ -1464,7 +1464,7 @@ if (!class_exists('WP_Settings_Generator')) {
                     <button type="button" class="button wp-settings-media-remove" <?php echo empty($value) ? 'style="display:none;"' : ''; ?>><?php echo esc_html($remove_button_text); ?></button>
                 </div>
             </div>
-        <?php
+            <?php
         }
 
         /**
@@ -1859,7 +1859,7 @@ if (!class_exists('WP_Settings_Generator')) {
                         });
                     });
                 </script>
-<?php
+                <?php
             });
         }
     }
