@@ -640,6 +640,40 @@ function simpli_rewards_admin_page_init() {
 }
 add_action('init', 'simpli_rewards_admin_page_init');
 ```
+
+### Post and Page Fields
+Have added 2 new fields, one for retrieving posts and one for retrieving pages.<br/>
+Both fields have support to be multiselect or singular
+#### Page Field
+```
+ $settings->add_page_field(
+    'new_page',
+    __('Pages'),
+    [
+        'description' => __(''),
+        'multi' => true // omit or set to false for singular select
+    ],
+    'dashboard'
+);
+```
+#### Post Field
+The post field can also be filtered by post type and taxonomy
+```
+$settings->add_post_field(
+    'new_post',
+    __('Posts'),
+    [
+        'description' => __(''),
+        'multi' => true, // omit or set to false for singular select
+        'post_type' => 'product', // define post type default is post
+        'taxonomy' => 'product_cat', // define taxonomy default is category but only used if terms defined
+        'field' => 'slug' // what to filter by term_id, slug or name. Default is slug but only used if terms defined
+        'terms' => ['decor', 'music'], // omit to not filter by taxonomy, can be singular or array
+    ],
+    'dashboard'
+);
+```
+
 ### Create Custom Fields
 To create a new custom field there is a hook, here is an example on how to create a page picker ```do_action('wp_settings_generator_render_field_' . $field['type'], $field, $name, $value, $this);``` where you replace the ```$field['type']``` with what you want it to be
 Here is an example to create a page picker<br/>

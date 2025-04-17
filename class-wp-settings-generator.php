@@ -713,6 +713,34 @@ if (!class_exists('WP_Settings_Generator')) {
         {
             return $this->add_field($field_id, $title, 'color', $args, $tab_id);
         }
+        
+        /**
+         * Add page field
+         *
+         * @param  mixed $field_id
+         * @param  mixed $title
+         * @param  mixed $args
+         * @param  mixed $tab_id
+         * @return void
+         */
+        public function add_page_field($field_id, $title, $args = [], $tab_id = '')
+        {
+            return $this->add_field($field_id, $title, 'page', $args, $tab_id);
+        }
+        
+        /**
+         * Add post field
+         *
+         * @param  mixed $field_id
+         * @param  mixed $title
+         * @param  mixed $args
+         * @param  mixed $tab_id
+         * @return void
+         */
+        public function add_post_field($field_id, $title, $args = [], $tab_id = '')
+        {
+            return $this->add_field($field_id, $title, 'post', $args, $tab_id);
+        }
 
         /**
          * Register the settings page in WordPress admin
@@ -917,6 +945,34 @@ if (!class_exists('WP_Settings_Generator')) {
                     // Don't sanitize passwords (they'll be hashed elsewhere if needed)
                     return $value;
 
+                case 'page':
+                    // Check if multi is enabled
+                    if (isset($field['multi']) && $field['multi'] === true) {
+                        // Handle array of page IDs (similar to multiselect)
+                        if (is_array($value)) {
+                            return array_map('absint', $value);
+                        } else {
+                            return array(); // Return empty array if no pages selected
+                        }
+                    } else {
+                        // Single page selection, just return the ID as integer
+                        return absint($value);
+                    }
+
+                case 'post':
+                    // Check if multi is enabled
+                    if (isset($field['multi']) && $field['multi'] === true) {
+                        // Handle array of page IDs (similar to multiselect)
+                        if (is_array($value)) {
+                            return array_map('absint', $value);
+                        } else {
+                            return array(); // Return empty array if no pages selected
+                        }
+                    } else {
+                        // Single page selection, just return the ID as integer
+                        return absint($value);
+                    }
+
                 default:
                     // Allow custom sanitization via hooks
                     $custom_sanitized = apply_filters('wp_settings_generator_sanitize_' . $field['type'], $value, $field);
@@ -1036,10 +1092,6 @@ if (!class_exists('WP_Settings_Generator')) {
                     $this->render_toggle_field($field, $name, $value);
                     break;
 
-                case 'toggle':
-                    $this->render_toggle_field($field, $name, $value);
-                    break;
-
                 case 'radio':
                     $this->render_radio_field($field, $name, $value);
                     break;
@@ -1082,6 +1134,14 @@ if (!class_exists('WP_Settings_Generator')) {
 
                 case 'color':
                     $this->render_color_field($field, $name, $value);
+                    break;
+
+                case 'page':
+                    $this->render_page_field($field, $name, $value);
+                    break;
+
+                case 'post':
+                    $this->render_post_field($field, $name, $value);
                     break;
 
                 default:
@@ -1598,6 +1658,126 @@ if (!class_exists('WP_Settings_Generator')) {
                 value="<?php echo esc_attr($value); ?>"
                 class="<?php echo esc_attr($class); ?>"
                 <?php echo $attr_string; ?> />
+            <?php
+        }
+        
+        /**
+         * Render a page select field
+         *
+         * @param  mixed $field
+         * @param  mixed $name
+         * @param  mixed $value
+         * @return void
+         */
+        private function render_page_field($field, $name, $value)
+        {
+            $class = !empty($field['class']) ? $field['class'] . ' wp-settings-select' : 'wp-settings-select';
+            $attrs = isset($field['attributes']) ? $field['attributes'] : [];
+            $attr_string = $this->build_attributes($attrs);
+
+            $multi = isset($field['multi']) ? $field['multi'] : false;
+            $multiselect = '';
+            
+            if($multi) {
+                $multiselect = 'multiple="multiple"';
+                // Ensure value is always an array for multiselect
+                if (!is_array($value)) {
+                    $value = empty($value) ? array() : array($value);
+                }
+            }
+            
+            $pages = get_pages();
+            ?>
+            <select
+                id="<?php echo esc_attr($field['id']); ?>"
+                name="<?php echo esc_attr($name); ?><?php echo $multi ? '[]' : ''; ?>"
+                class="<?php echo esc_attr($class); ?>"
+                <?php echo $multiselect; ?>
+                <?php echo $attr_string; ?>>
+                <?php if(!$multi) { ?>
+                <option value=""><?= __('Choose a page') ?></option>
+                <?php } ?>
+                <?php foreach ($pages as $page) : ?>
+                    <option value="<?php echo esc_attr($page->ID); ?>" 
+                        <?php if($multi): ?>
+                            <?php selected(in_array($page->ID, $value), true); ?>
+                        <?php else: ?>
+                            <?php selected($value, $page->ID); ?>
+                        <?php endif; ?>>
+                        <?php echo esc_html($page->post_title); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <?php
+        }
+        
+        /**
+         * Render a post select field
+         *
+         * @param  mixed $field
+         * @param  mixed $name
+         * @param  mixed $value
+         * @return void
+         */
+        private function render_post_field($field, $name, $value)
+        {
+            $class = !empty($field['class']) ? $field['class'] . ' wp-settings-select' : 'wp-settings-select';
+            $attrs = isset($field['attributes']) ? $field['attributes'] : [];
+            $attr_string = $this->build_attributes($attrs);
+
+            $multi = isset($field['multi']) ? $field['multi'] : false;
+            $multiselect = '';
+            
+            if($multi) {
+                $multiselect = 'multiple="multiple"';
+                // Ensure value is always an array for multiselect
+                if (!is_array($value)) {
+                    $value = empty($value) ? array() : array($value);
+                }
+            }
+
+            $post_type = isset($field['post_type']) ? $field['post_type'] : 'post';
+            $args = [
+                'numberposts' => -1,
+                'post_type' => $post_type,
+            ];
+
+            $taxonomy = isset($field['taxonomy']) ? $field['taxonomy'] : 'category';
+            $terms = isset($field['terms']) ? $field['terms'] : false;
+            $term_field = isset($field['field']) ? $field['field'] : 'slug';
+            
+            if($terms) {
+                $args['tax_query'] = [
+                    [
+                        'taxonomy' => $taxonomy,
+                        'field' => $term_field,
+                        'terms' => $terms
+                    ],
+                ];
+            }
+
+            $posts = get_posts($args);
+            ?>
+            <select
+                id="<?php echo esc_attr($field['id']); ?>"
+                name="<?php echo esc_attr($name); ?><?php echo $multi ? '[]' : ''; ?>"
+                class="<?php echo esc_attr($class); ?>"
+                <?php echo $multiselect; ?>
+                <?php echo $attr_string; ?>>
+                <?php if(!$multi) { ?>
+                <option value=""><?= __('Choose a') ?> <?= $post_type ?></option>
+                <?php } ?>
+                <?php foreach ($posts as $post) : ?>
+                    <option value="<?php echo esc_attr($post->ID); ?>" 
+                        <?php if($multi): ?>
+                            <?php selected(in_array($post->ID, $value), true); ?>
+                        <?php else: ?>
+                            <?php selected($value, $post->ID); ?>
+                        <?php endif; ?>>
+                        <?php echo esc_html($post->post_title); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
             <?php
         }
 
