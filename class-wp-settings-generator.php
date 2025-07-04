@@ -851,6 +851,8 @@ if (!class_exists('WP_Settings_Generator')) {
                 }
             }
 
+            // Hook for when settings are saved
+            do_action($this->page_id . '_settings_saving', $input, $output);
             return $output;
         }
 
